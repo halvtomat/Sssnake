@@ -65,7 +65,7 @@ void input(){
 
 }
 void logic(){
-    switch (dir){
+switch (dir){
     case UP:
         snake_y++;
         break;
