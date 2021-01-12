@@ -5,11 +5,21 @@
 bool running;
 const int HEIGHT = 480;
 const int WIDTH = 640;
+const int move_speed = 10;
+const int frame_delay = 100;
 int snake_x, snake_y, length, food_x, food_y; 
 enum e_dir {LEFT = 0, UP = 1, RIGHT = 2, DOWN = 3};
 e_dir dir;
 
-void setup(SDL_Window* window, SDL_Surface* screen_surface){
+SDL_Window* window = NULL;
+SDL_Surface* screen_surface = NULL;
+SDL_Renderer* gRenderer = NULL; 
+SDL_Event e;
+
+void setup(){
+    snake_x = WIDTH/2;
+    snake_y = HEIGHT/2;
+    dir = UP;
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
         std::cout << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
     else{
@@ -17,10 +27,9 @@ void setup(SDL_Window* window, SDL_Surface* screen_surface){
         if(window == NULL)
             std::cout << "Window could not be created SDL_Error: " << SDL_GetError() << "\n";
         else{
-            screen_surface = SDL_GetWindowSurface(window);
-            SDL_FillRect(screen_surface, NULL, SDL_MapRGB(screen_surface->format, 0xFF, 0xFF, 0xFF));
-            SDL_UpdateWindowSurface(window);
-            SDL_Delay(2000);
+            gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+            if(gRenderer == NULL)
+                std::cout << "Renderer could not be created! SDL_Error: " << SDL_GetError() << "\n";
         }
     }
     running = true;
@@ -31,85 +40,82 @@ void setup(SDL_Window* window, SDL_Surface* screen_surface){
     food_y = rand() % HEIGHT;
 }
 
-void draw(){
-    /*
-    system("clear");
-
-    for(int i = 0; i < width+2; i++){
-        //printw("#");
-    }
-    printw("\n");
-
-    for(int i = 0; i < height; i++){
-        for(int j = 0; j < width+2; j++){
-            if(j == 0 || j == width+1) printw("#");
-            else if(i == snake_y && j == snake_x) printw("@");
-            else if(i == food_y && j == food_x) printw("+");
-            else printw(" ");
-        }
-        printw("\n");
-    }
-
-    for(int i = 0; i < width+2; i++){
-        printw("#");
-    }
-    printw("\n");
-    */
+void exit(){
+    running = false;
+    SDL_Quit();
 }
 
-void input(){
-    /*
-    if(int in = getch() != ERR){
-        switch (in){
-        case 'w':
+void draw(){
+    //Clear the screen
+    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(gRenderer);
+
+    //Draw snake
+    SDL_Rect head = {snake_x, snake_y, 20, 20};
+    SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+    SDL_RenderFillRect(gRenderer, &head);
+
+    //Update Screen
+    SDL_RenderPresent(gRenderer);
+}
+
+void input(int k){
+    switch (k){
+        case SDLK_UP:
             dir = UP;
             break;
-        case 'a':
+        case SDLK_LEFT:
             dir = LEFT;
             break;
-        case 's':
+        case SDLK_DOWN:
             dir = DOWN;
             break;
-        case 'd':
+        case SDLK_RIGHT:
             dir = RIGHT;
+            break;
+        case SDLK_ESCAPE:
+            exit();
             break;
         default:
             break;
-        }
     }
-*/
 }
 
 void logic(){
     switch (dir){
         case UP:
-            snake_y++;
+            snake_y -= move_speed;
             break;
         case LEFT:
-            snake_x--;
+            snake_x -= move_speed;
             break;
         case DOWN:
-            snake_y--;
+            snake_y += move_speed;
             break;
         case RIGHT:
-            snake_x++;
+            snake_x += move_speed;
             break;
         default:
             break;
         }
 }
 
+void poll_events(){
+    while(SDL_PollEvent(&e) != 0){
+        if(e.type == SDL_QUIT)
+            exit();
+        if(e.type == SDL_KEYDOWN)
+            input(e.key.keysym.sym);
+    }
+}
+
 int main(int argc, char const *argv[]){
-    SDL_Window* window = NULL;
-    SDL_Surface* screen_surface = NULL;
-    setup(window, screen_surface);
+    setup();
     while(running){
+        poll_events();
         draw();
-        input();
         logic();
-        sleep(1);
-        SDL_Quit();
-        running = false;
+        SDL_Delay(frame_delay);
     }
     return 0;
 }
