@@ -24,7 +24,7 @@ struct food_{
 bool running;
 const int HEIGHT = 480;
 const int WIDTH = 640;
-const int move_speed = 10;
+const int move_speed = 1;
 const int frame_delay = 100;
 const int snake_size = 20;
 const int food_size = 20;
@@ -53,25 +53,46 @@ void setup(){
         }
     }
     running = true;
-
-    snake.x = WIDTH/2;
-    snake.y = HEIGHT/2;
-    snake.length = 1;
-    snake_tail tail;
-    tail.x = 1;
-    tail.y = 1;
-    tail.tail = NULL;
-    snake.tail = &tail;
+    snake = {WIDTH/2/snake_size, HEIGHT/2/snake_size, 0, NULL};
     dir = UP;
     srand(time(NULL));
-    food.x = rand() % WIDTH;
-    food.y = rand() % HEIGHT;
-    std::cout << "a\n";
+    food = {rand() % WIDTH/snake_size, rand() % HEIGHT/snake_size};
+}
+
+void free_tail(){
+    snake_tail* head = snake.tail;
+    snake_tail* tmp;
+    while(head != NULL){
+        tmp = head;
+        head = head->tail;
+        free(tmp);
+    }
 }
 
 void exit(){
+    free_tail();
     running = false;
     SDL_Quit();
+}
+
+void add_tail(){
+    //std::cout << "snake length = " << snake.length << "\n";
+    snake_tail* new_tail = (snake_tail*)malloc(sizeof(snake_tail));
+    *new_tail = {snake.x, snake.y, NULL};
+    if(snake.length != 0){
+        snake_tail* last = snake.tail;
+        for(int i = 1; i < snake.length; i++)
+            last = last->tail;
+        last->tail = new_tail;
+    }
+    else{
+        snake.tail = new_tail;
+    }
+    snake.length = snake.length + 1;
+}
+
+void move_food(){
+    food = {rand() % WIDTH/snake_size, rand() % HEIGHT/snake_size};
 }
 
 void draw(){
@@ -80,21 +101,21 @@ void draw(){
     SDL_RenderClear(gRenderer);
 
     //Draw snake head
-    SDL_Rect rect = {snake.x, snake.y, snake_size, snake_size};
+    SDL_Rect rect = {snake.x*snake_size, snake.y*snake_size, snake_size, snake_size};
     SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
     SDL_RenderFillRect(gRenderer, &rect);
 
     //Draw snake tail
     snake_tail* tail = snake.tail;
     for(int i = 0; i < snake.length; i++){
-        rect = {tail->x, tail->y, snake_size, snake_size};
+        rect = {tail->x*snake_size, tail->y*snake_size, snake_size, snake_size};
         SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
         SDL_RenderFillRect(gRenderer, &rect);
         tail = tail->tail;
     }
 
     //Draw food
-    rect = {food.x, food.y, food_size, food_size};
+    rect = {food.x*snake_size, food.y*snake_size, food_size, food_size};
     SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0xFF, 0xFF);
     SDL_RenderFillRect(gRenderer, &rect);
 
@@ -105,16 +126,20 @@ void draw(){
 void input(int k){
     switch (k){
         case SDLK_UP:
-            dir = UP;
+            if(dir == LEFT || dir == RIGHT)
+                dir = UP;
             break;
         case SDLK_LEFT:
-            dir = LEFT;
+            if(dir == UP || dir == DOWN)
+                dir = LEFT;
             break;
         case SDLK_DOWN:
-            dir = DOWN;
+            if(dir == LEFT || dir == RIGHT)
+                dir = DOWN;
             break;
         case SDLK_RIGHT:
-            dir = RIGHT;
+            if(dir == UP || dir == DOWN)
+                dir = RIGHT;
             break;
         case SDLK_ESCAPE:
             exit();
@@ -125,20 +150,33 @@ void input(int k){
 }
 
 void logic(){
+    //std::cout << "snake(x,y) = (" << snake.x << "," << snake.y << ")\nfood(x,y) = (" << food.x << "," << food.y << ")\n";
+    //Check if food is eaten
+    if(snake.x == food.x && snake.y == food.y){
+        add_tail();
+        move_food();
+    }
+
     //Move snake tail
-    snake_tail* prev = NULL;
+    int prev_x, prev_y;
     snake_tail* tail = NULL;
     for(int i = 0; i < snake.length; i++){
-        if(i = 0){ //tail just behind head
+        if(i == 0){ //tail just behind head
             tail = snake.tail;
+            prev_x = tail->x;
+            prev_y = tail->y;
             tail->x = snake.x;
             tail->y = snake.y;
         }
         else{
-            prev = tail;
-            tail = prev->tail;
-            tail->x = prev->x;
-            tail->y = prev->y;
+            int tmp_x, tmp_y;
+            tail = tail->tail;
+            tmp_x = tail->x;
+            tmp_y = tail->y;
+            tail->x = prev_x;
+            tail->y = prev_y;
+            prev_x = tmp_x;
+            prev_y = tmp_y;
         }
     }
 
@@ -173,10 +211,10 @@ void poll_events(){
 int main(int argc, char const *argv[]){
     setup();
     while(running){
-        poll_events();
         logic();
         draw();
         SDL_Delay(frame_delay);
+        poll_events();
     }
     return 0;
 }
