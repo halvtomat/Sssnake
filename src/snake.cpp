@@ -107,7 +107,6 @@ void Snake::move(){
 }
 
 void Snake::change_dir(int new_dir){
-    e_dir dir = this->dir;
     switch(new_dir){
         case SDLK_UP:
             if(dir == LEFT || dir == RIGHT)
@@ -125,5 +124,16 @@ void Snake::change_dir(int new_dir){
             if(dir == UP || dir == DOWN)
                 dir = RIGHT;
             break;
+        default:
+            break;
     }
+}
+int Snake::get_x(){
+    return head.x;
+}
+int Snake::get_y(){
+    return head.y;
+}
+int Snake::get_length(){
+    return length;
 }

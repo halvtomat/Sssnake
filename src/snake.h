@@ -5,6 +5,16 @@
 #include <SDL2/SDL.h>
 
 class Snake{
+    public:
+        Snake(int window_width, int window_height, int size, int move_speed);
+        ~Snake();
+        void add_tail();
+        void draw(SDL_Renderer* renderer);
+        void move();
+        void change_dir(int new_dir);
+        int get_x();
+        int get_y();
+        int get_length();
     private:
         int WINDOW_WIDTH;
         int WINDOW_HEIGHT; 
@@ -18,16 +28,6 @@ class Snake{
             snake_part* tail;
         } head;
         void free_tail();
-    public:
-        Snake(int window_width, int window_height, int size, int move_speed);
-        ~Snake();
-        void add_tail();
-        void draw(SDL_Renderer* renderer);
-        void move();
-        void change_dir(int new_dir);
-        int get_x();
-        int get_y();
-        int get_length();
 };
 
 #endif

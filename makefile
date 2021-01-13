@@ -1,5 +1,5 @@
 #OBJS define object files
-OBJS = game.cpp snake.cpp
+OBJS = src/game.cpp src/snake.cpp src/food.cpp
 
 #OBJ_NAME defines the name of the executable
 OBJ_NAME = Game
