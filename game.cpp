@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <SDL2/SDL.h>
+#include "snake.h"
 
 
 struct snake_tail{
@@ -22,8 +23,8 @@ struct food_{
 };
 
 bool running;
-const int HEIGHT = 480;
-const int WIDTH = 640;
+const int HEIGHT = 720;
+const int WIDTH = 1280;
 const int move_speed = 1;
 const int frame_delay = 100;
 const int snake_size = 20;
@@ -197,6 +198,15 @@ void logic(){
         default:
             break;
         }
+    //Window-edge teleporting
+    if(snake.x*snake_size > WIDTH)
+        snake.x = 0;
+    if(snake.x*snake_size < 0)
+        snake.x = WIDTH/snake_size;
+    if(snake.y*snake_size > HEIGHT)
+        snake.y = 0;
+    if(snake.y*snake_size < 0)
+        snake.y = HEIGHT/snake_size;
 }
 
 void poll_events(){
@@ -211,10 +221,11 @@ void poll_events(){
 int main(int argc, char const *argv[]){
     setup();
     while(running){
+        unsigned int start = SDL_GetTicks();
         logic();
         draw();
-        SDL_Delay(frame_delay);
         poll_events();
+        SDL_Delay(start + 32 - SDL_GetTicks());
     }
     return 0;
 }
