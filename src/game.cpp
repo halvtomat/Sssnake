@@ -13,8 +13,13 @@ void setup(){
                 std::cout << "Renderer could not be created! SDL_Error: " << SDL_GetError() << "\n";
         }
     }
-    if(TTF_Init() == -1){
+
+    if(TTF_Init() < 0){
         std::cout << "SDL_ttf could not be initialized! SDL_ttf Error: " << SDL_GetError() << "\n";
+    }    
+    score_font = TTF_OpenFont("media/BebasNeue-Regular.ttf", font_size);
+    if(score_font == NULL){
+        std::cout << "TTF_OpenFont could not load font! TTF_Error: " << TTF_GetError() << "\n";
     }
     running = true;
 }
@@ -22,6 +27,7 @@ void setup(){
 void exit(){
     snake.~Snake();
     food.~Food();
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -35,10 +41,16 @@ void draw(){
     food.draw(renderer);
 
     //Draw score
-    TTF_Font *score_font = TTF_OpenFont("/media/BebasNeue-Regular.ttf", font_size);
     SDL_Color black = {0, 0, 0};
-    std::string score = std::to_string(snake.get_length());
-    SDL_Surface* score = TTF_RenderText_Solid(score_font, score.c_str(), black);
+    std::string score_string = std::to_string(snake.get_length());
+    //SDL_Surface* score_surface = TTF_RenderText_Solid(score_font, score_string.c_str(), black);
+    //SDL_Texture* score_texture = SDL_CreateTextureFromSurface(renderer, score_surface);
+    //SDL_Rect score_rect = {WINDOW_WIDTH-40, 40, 40, 40};
+
+    //SDL_RenderCopy(renderer, score_texture, NULL, &score_rect);
+
+    //SDL_FreeSurface(score_surface);
+    //SDL_DestroyTexture(score_texture);
 
     //Update Screen
     SDL_RenderPresent(renderer);
@@ -79,7 +91,7 @@ int main(){
         logic();
         draw();
         poll_events();
-        SDL_Delay(start + 32 - SDL_GetTicks());
+        SDL_Delay(start + 48 - SDL_GetTicks());
     }
     exit();
     return 0;

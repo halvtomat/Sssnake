@@ -21,6 +21,7 @@ SDL_Window* window = NULL;
 SDL_Surface* screen_surface = NULL;
 SDL_Renderer* renderer = NULL; 
 SDL_Event e;
+TTF_Font* score_font = NULL;
 
 bool running;
 
