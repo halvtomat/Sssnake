@@ -15,6 +15,7 @@ class Snake{
         int get_x();
         int get_y();
         int get_length();
+        bool collision();
     private:
         int WINDOW_WIDTH;
         int WINDOW_HEIGHT; 

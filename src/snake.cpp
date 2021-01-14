@@ -4,10 +4,11 @@ void Snake::free_tail(){
     snake_part* curr = head.tail;
     snake_part* tmp;
     while(curr != NULL){
-        tmp = curr;
-        curr = curr->tail;
-        free(tmp);
+        tmp = curr->tail;
+        free(curr);
+        curr = tmp;
     }
+    head.tail = NULL;
 }
 
 Snake::Snake(int window_width, int window_height, int size, int move_speed){
@@ -128,12 +129,25 @@ void Snake::change_dir(int new_dir){
             break;
     }
 }
+
 int Snake::get_x(){
     return head.x;
 }
+
 int Snake::get_y(){
     return head.y;
 }
+
 int Snake::get_length(){
     return length;
+}
+
+bool Snake::collision(){
+    snake_part* tail = head.tail;
+    for(int i = 0; i < length-1; i++){
+        if(head.x == tail->x && head.y == tail->y)
+            return true;
+        tail = tail->tail;
+    }
+    return false;
 }
