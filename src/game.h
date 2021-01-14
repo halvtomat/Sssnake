@@ -2,7 +2,9 @@
 #define GAME_H
 
 #include <iostream>
+#include <string>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "snake.h"
 #include "food.h"
 
@@ -11,6 +13,7 @@ const int WINDOW_HEIGHT = 720;
 const int move_speed = 1;
 const int snake_size = 20;
 const int food_size = 20;
+const int font_size = 24;
 Snake snake(WINDOW_WIDTH, WINDOW_HEIGHT, snake_size, move_speed);
 Food food(WINDOW_WIDTH, WINDOW_HEIGHT, food_size);
 

@@ -13,6 +13,9 @@ void setup(){
                 std::cout << "Renderer could not be created! SDL_Error: " << SDL_GetError() << "\n";
         }
     }
+    if(TTF_Init() == -1){
+        std::cout << "SDL_ttf could not be initialized! SDL_ttf Error: " << SDL_GetError() << "\n";
+    }
     running = true;
 }
 
@@ -27,8 +30,15 @@ void draw(){
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
 
+    //Draw snake and food
     snake.draw(renderer);
     food.draw(renderer);
+
+    //Draw score
+    TTF_Font *score_font = TTF_OpenFont("/media/BebasNeue-Regular.ttf", font_size);
+    SDL_Color black = {0, 0, 0};
+    std::string score = std::to_string(snake.get_length());
+    SDL_Surface* score = TTF_RenderText_Solid(score_font, score.c_str(), black);
 
     //Update Screen
     SDL_RenderPresent(renderer);
