@@ -20,6 +20,7 @@ Snake::Snake(int window_width, int window_height, int size, int move_speed){
     head = {WINDOW_WIDTH/2/size, WINDOW_HEIGHT/2/size, NULL};
     dir = UP;
 }
+
 Snake::~Snake(){
     free_tail();
 }
