@@ -1,9 +1,8 @@
 #ifndef FOOD_H
 #define FOOD_H
 
-#include <iostream>
+#include <ctime>
 #include <SDL2/SDL.h>
-
 class Food{
     public:
         Food(int window_width, int window_height, int size);

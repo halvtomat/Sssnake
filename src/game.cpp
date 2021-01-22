@@ -83,6 +83,7 @@ int main(){
         poll_events();
         SDL_Delay(start + 48 - SDL_GetTicks());
     }
+    std::cout << "Final score: " << score.get() << "\n";
     exit();
     return 0;
 }
